@@ -9,6 +9,8 @@ import ProfilePage from "../pages/ProfilePage";
 import AdminPage from "../pages/AdminPage";
 import ForbiddenPage from "../pages/ForbiddenPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import RecepieDetailsPage from "../pages/RecepieDetailsPage";
+import RecepiesPage from "../pages/RecepiesPage";
 
 import ProtectedRoute from "../auth/ProtectedRoute";
 import RequireRole from "../auth/RequireRole";
@@ -21,6 +23,8 @@ export default function AppRouter() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/recepie/:id?" element={<RecepieDetailsPage />} />
+        <Route path="/recepies" element={<RecepiesPage />} />
 
         {/* Protected (any logged in user) */}
         <Route

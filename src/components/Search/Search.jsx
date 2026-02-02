@@ -111,7 +111,7 @@ export default function Search({
     if (!finalValue) return;
 
     console.log(`redirected to the page recepies?category=${finalValue}`);
-    //navigate(`/recepies?category=${encodeURIComponent(finalValue)}`);
+    navigate(`/recepies?category=${encodeURIComponent(finalValue)}`);
   }
 
   function onKeyDown(e) {
@@ -160,7 +160,7 @@ export default function Search({
             aria-controls="recipe-search-listbox"
           />
 
-          {isOpen && (isLoading || suggestions.length > 0) && (
+          {isOpen && (
             <div className="recipe-search__dropdown" role="listbox" id="recipe-search-listbox">
               {isLoading && <div className="recipe-search__hint">Loading…</div>}
 

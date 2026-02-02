@@ -7,10 +7,9 @@ import { MOCK_SMALL_CARDS_DATA } from "../mockData/mockData";
 export default function HomePage() {
   return (
     <div>
-      <h1>TonyRecepies</h1>
-      <p>Home page (public). Later we’ll show featured recipes, search, categories, etc.</p>
+      <h1>Tony Recepies</h1>
       <Search />
-      <SmallCardList cardsData={MOCK_SMALL_CARDS_DATA}/>
+      <SmallCardList cardsData={MOCK_SMALL_CARDS_DATA} header={"Popular Recepie Types"}/>
     </div>
   );
 }
