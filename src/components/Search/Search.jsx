@@ -2,21 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MOCK_RECIPE_TYPES } from "../../mockData/mockData";
 import "./Search.scss";
+import { apiHelper } from "../../apiHelper/http";
 
 function normalize(s) {
   return (s || "").trim().toLowerCase();
-}
-
-function dedupeStrings(arr) {
-  const seen = new Set();
-  const out = [];
-  for (const s of arr) {
-    const key = normalize(s);
-    if (!key || seen.has(key)) continue;
-    seen.add(key);
-    out.push(s);
-  }
-  return out;
 }
 
 export default function Search({
@@ -62,35 +51,25 @@ export default function Search({
         return;
       }
 
-      setIsLoading(true);
-
-      // MOCK (replace with real API later)
-      const filtered = MOCK_RECIPE_TYPES.filter((x) => normalize(x).includes(q));
-      const next = dedupeStrings(filtered).slice(0, maxSuggestions);
-
-      setSuggestions(next);
-      setIsOpen(true);
-      setHighlightIndex(-1);
-      setIsLoading(false);
-
-      /*
       try {
         setIsLoading(true);
-        const res = await fetch(`/api/recipe-types?query=${encodeURIComponent(q)}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (!res.ok) throw new Error("Failed to fetch suggestions");
-        const data = await res.json(); // array of strings, e.g. ["pizza","pasta"]
-        const next = dedupeStrings(data).slice(0, maxSuggestions);
+        setIsOpen(true);
+        const res = await apiHelper.get(`https://localhost:7210/api/search/suggestions?q=${query}&limit=8`);
+        if (res.status != 200) throw new Error("Failed to fetch suggestions");
+        const data = await res.data;
+        const next = data.slice(0, maxSuggestions);
+
+        console.log(next);
 
         setSuggestions(next);
-        setIsOpen(true);
         setHighlightIndex(-1);
-      } finally {
+      } catch (err) {
+        setIsLoading(false)
+      } 
+      finally {
         setIsLoading(false);
       }
-      */
+      
     }
 
     timerId = setTimeout(loadSuggestions, debounceMs);
@@ -169,18 +148,18 @@ export default function Search({
                 suggestions.map((item, idx) => (
                   <button
                     type="button"
-                    key={item}
+                    key={item.id}
                     className={
                       "recipe-search__option" +
                       (idx === highlightIndex ? " recipe-search__option--active" : "")
                     }
                     onMouseEnter={() => setHighlightIndex(idx)}
                     onMouseDown={(e) => e.preventDefault()} 
-                    onClick={() => selectSuggestion(item)}
+                    onClick={() => selectSuggestion(item.label)}
                     role="option"
                     aria-selected={idx === highlightIndex}
                   >
-                    {item}
+                    {item.label}
                   </button>
                 ))}
             </div>
