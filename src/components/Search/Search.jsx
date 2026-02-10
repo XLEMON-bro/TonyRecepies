@@ -37,7 +37,6 @@ export default function Search({
 
   const canSuggest = useMemo(() => normalize(query).length >= minChars, [query, minChars]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     function onDocMouseDown(e) {
       if (!rootRef.current) return;
@@ -65,7 +64,7 @@ export default function Search({
 
       setIsLoading(true);
 
-      // ✅ MOCK implementation (replace with real API later)
+      // MOCK (replace with real API later)
       const filtered = MOCK_RECIPE_TYPES.filter((x) => normalize(x).includes(q));
       const next = dedupeStrings(filtered).slice(0, maxSuggestions);
 
@@ -75,8 +74,6 @@ export default function Search({
       setIsLoading(false);
 
       /*
-      // ✅ REAL API 
-      // Try to keep this debounced like now.
       try {
         setIsLoading(true);
         const res = await fetch(`/api/recipe-types?query=${encodeURIComponent(q)}`, {
@@ -178,7 +175,7 @@ export default function Search({
                       (idx === highlightIndex ? " recipe-search__option--active" : "")
                     }
                     onMouseEnter={() => setHighlightIndex(idx)}
-                    onMouseDown={(e) => e.preventDefault()} // prevents input blur before click
+                    onMouseDown={(e) => e.preventDefault()} 
                     onClick={() => selectSuggestion(item)}
                     role="option"
                     aria-selected={idx === highlightIndex}

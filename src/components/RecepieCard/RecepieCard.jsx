@@ -2,29 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./RecepieCard.module.scss";
 
-/**
- * Mock API call for AddToFavourite action.
- * Simulates latency and potential errors.
- */
 async function addToFavouriteMockApi(recepieId, makeFavourite) {
-  // simulate network latency
   await new Promise((r) => setTimeout(r, 500));
 
-  // Uncomment to test error handling sometimes
-  // if (Math.random() < 0.1) throw new Error("Failed to update favourite");
-
-  return { recepieId, isFavourite: makeFavourite };
+  return { ok: true, status: 200, data: { recepieId, isFavourite: makeFavourite } };
 }
 
-/**
- * RecepieCard (training-material style)
- *
- * Debounce strategy:
- * - UI updates instantly (optimistic)
- * - wait a short time (e.g. 350ms) to see if user clicks again
- * - send only final intended value to API
- * - rollback if API fails
- */
 export default function RecepieCard({ recepie, onFavouriteChanged }) {
   const navigate = useNavigate();
 
@@ -32,19 +15,15 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
-  // Keep track of the "server confirmed" value so we can rollback correctly.
-  const lastConfirmedRef = useRef(!!recepie.isFavourite);
-
-  // Debounce timer + last desired state
-  const debounceTimerRef = useRef(null);
-  const pendingDesiredRef = useRef(!!recepie.isFavourite);
-
-  // Prevent state updates if component unmounts during async call
   const isMountedRef = useRef(true);
+
   useEffect(() => {
+    isMountedRef.current = true;
+    console.log("State updated maunted!");
+
     return () => {
       isMountedRef.current = false;
-      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+      console.log("State updated unmaunted!");
     };
   }, []);
 
@@ -52,50 +31,36 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
     navigate(`/recepie/${recepie.id}`);
   }
 
-  function onStarClick(e) {
+  async function onStarClick(e) {
     e.stopPropagation();
     e.preventDefault();
 
-    // Optimistic toggle (instant feedback)
-    const next = !pendingDesiredRef.current;
-    pendingDesiredRef.current = next;
+    // ignore clicks while saving
+    if (isSaving) return;
 
-    setIsFavourite(next);
+    setIsSaving(true);
     setError("");
 
-    // Debounce: clear old timer and schedule a new request
-    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
-
-    debounceTimerRef.current = setTimeout(() => {
-      // Send only the final intended value
-      void persistFavourite(pendingDesiredRef.current);
-    }, 350);
-  }
-
-  async function persistFavourite(finalDesiredValue) {
-    // If the user already sees the final value, we just persist it now
-    setIsSaving(true);
+    const nextDesired = !isFavourite; // user intention
 
     try {
-      const res = await addToFavouriteMockApi(recepie.id, finalDesiredValue);
+      const res = await addToFavouriteMockApi(recepie.id, nextDesired);
 
       if (!isMountedRef.current) return;
 
-      // Confirm with server response
-      lastConfirmedRef.current = res.isFavourite;
-      pendingDesiredRef.current = res.isFavourite;
-
-      setIsFavourite(res.isFavourite);
-      onFavouriteChanged?.(recepie.id, res.isFavourite);
+      if (res.ok && res.status === 200) {
+        setIsFavourite(nextDesired);
+        onFavouriteChanged?.(recepie.id, nextDesired);
+      } else {
+        setError(`Failed to update favourite (status: ${res.status})`);
+      }
     } catch (err) {
       if (!isMountedRef.current) return;
 
-      // Rollback to last confirmed state
-      pendingDesiredRef.current = lastConfirmedRef.current;
-      setIsFavourite(lastConfirmedRef.current);
       setError(err?.message ?? "AddToFavourite failed");
     } finally {
       if (!isMountedRef.current) return;
+
       setIsSaving(false);
     }
   }
@@ -109,9 +74,8 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") openDetails();
       }}
-      aria-label={`Open recipe ${recepie.name}`}
-    >
-      {/* Star button (top-right) */}
+      aria-label={`Open recipe ${recepie.name}`}>
+
       <button
         type="button"
         className={styles.starButton}
@@ -119,12 +83,11 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
         aria-pressed={isFavourite}
         aria-label={isFavourite ? "Remove from favourites" : "Add to favourites"}
         title={isFavourite ? "Favourite" : "Not favourite"}
+        disabled={isSaving}
       >
-        {/* Show spinner while saving, otherwise show star */}
         {isSaving ? <TinySpinner /> : <StarIcon filled={isFavourite} />}
       </button>
 
-      {/* Image takes ~1/3 */}
       <div className={styles.imageWrap}>
         <img
           className={styles.image}
@@ -134,10 +97,7 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
         />
       </div>
 
-      {/* Details */}
       <div className={styles.body}>
-        <div className={styles.divider} />
-
         <h3 className={styles.name}>{recepie.name}</h3>
 
         <div className={styles.meta}>
