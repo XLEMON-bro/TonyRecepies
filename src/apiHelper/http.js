@@ -1,26 +1,34 @@
 export async function apiRequest(url, options = {}) {
-  const response = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  console.log(response);
-
-  let data = null;
-
-  // Safely parse JSON if present
-  const contentType = response.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    data = await response.json();
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+      ...options,
+    });
+  
+    let data = null;
+  
+    // Safely parse JSON if present
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      data = await response.json();
+    }
+  
+    return {
+      status: response.status,
+      data
+    };
   }
+  catch (err) {
+    console.log(err);
 
-  return {
-    status: response.status,
-    data
-  };
+    return {
+      status: 999,
+      data: null
+    };
+  }
 }
 
 export const apiHelper = {

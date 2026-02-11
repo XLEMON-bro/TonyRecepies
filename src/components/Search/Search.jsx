@@ -11,8 +11,8 @@ function normalize(s) {
 export default function Search({
   title = "Find recipe type",
   placeholder = "Search recepie type",
-  minChars = 1,
-  debounceMs = 250,
+  minChars = 2,
+  debounceMs = 500,
   maxSuggestions = 8,
 }) {
   const navigate = useNavigate();
@@ -155,7 +155,7 @@ export default function Search({
                     }
                     onMouseEnter={() => setHighlightIndex(idx)}
                     onMouseDown={(e) => e.preventDefault()} 
-                    onClick={() => selectSuggestion(item.label)}
+                    onClick={() => selectSuggestion(item.value)}
                     role="option"
                     aria-selected={idx === highlightIndex}
                   >
