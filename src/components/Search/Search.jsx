@@ -85,7 +85,7 @@ export default function Search({
     const finalValue = (value ?? query).trim();
     if (!finalValue) return;
 
-    navigate(`/recepies?name=${encodeURIComponent(finalValue)}&page=1&pageSize=20`);
+    navigate(`/recepies?name=${encodeURIComponent(finalValue)}`);
   }
 
   function submitSuggestionSearch(value) {
@@ -93,7 +93,7 @@ export default function Search({
     selectSuggestion(value.value);
 
     if(value.type === 1){
-      navigate(`/recepies?categoryId=${value.categoryId}&page=1&pageSize=20`);
+      navigate(`/recepies?categoryId=${value.categoryId}`);
       return;
     }
 
@@ -102,7 +102,7 @@ export default function Search({
       return;
     }
     
-    navigate(`/recepies?name=${value.value}&page=1&pageSize=20`);
+    navigate(`/recepies?name=${value.value}`);
   }
 
   function onKeyDown(e) {

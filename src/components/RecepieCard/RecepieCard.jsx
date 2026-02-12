@@ -19,11 +19,9 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
 
   useEffect(() => {
     isMountedRef.current = true;
-    console.log("State updated maunted!");
 
     return () => {
       isMountedRef.current = false;
-      console.log("State updated unmaunted!");
     };
   }, []);
 

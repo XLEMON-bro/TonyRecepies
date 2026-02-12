@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import App from "../components/App";
 import Search from "../components/Search/Search";
-import SmallCardList from "../components/SmallCard/SmallCardList";
+import ListComponent from "../components/ListComponents/ListComponent";
 import { apiHelper } from "../apiHelper/http";
+import SmallCard from "../components/SmallCard/SmallCard";
 
 export default function HomePage() {
   const [cards, setCards] = useState([]);
@@ -38,7 +39,11 @@ export default function HomePage() {
     <div>
       <h1>Tony Recepies</h1>
       <Search />
-      {!cardsLoading && cards.length > 0 && (<SmallCardList cardsData={cards} header={"Popular Recepies"}/>)}
+      {!cardsLoading && cards.length > 0 && 
+        (<ListComponent header={"Popular Recepies"}>
+          {cards.map((card) => (<SmallCard key={card.id} card={card}/>))}
+        </ListComponent>)
+        }
     </div>
   );
 }

@@ -3,8 +3,12 @@ import RecepieCard from "../components/RecepieCard/RecepieCard";
 
 export default function RecepiesPage(){
     const [searchParams] = useSearchParams();
-    const category = searchParams.get("category"); // "pizza" | null
+    const name = searchParams.get("name"); 
+    const categoryId = searchParams.get("categoryId"); 
     const page = Number(searchParams.get("page") ?? 1);
+    //Todo fetch data for recipes by name or categoryId (deepends what we get from params)
+    //Add pagination for pages at the bottom of page
+    //Add search at the top
 
     const recepie = {
         id: 24,
@@ -20,7 +24,8 @@ export default function RecepiesPage(){
         <div>
             <h1>Recipes</h1>
             
-            {category && <p>Filtering by category: {category}</p>}
+            {categoryId && <p>Filtering by category: {categoryId}</p>}
+            {name && <p>Filtering by name: {name}</p>}
             <p>Page: {page}</p>
 
             <RecepieCard
