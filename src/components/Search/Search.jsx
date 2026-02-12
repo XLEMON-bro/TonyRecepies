@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { MOCK_RECIPE_TYPES } from "../../mockData/mockData";
 import "./Search.scss";
 import { apiHelper } from "../../apiHelper/http";
 
@@ -86,8 +85,24 @@ export default function Search({
     const finalValue = (value ?? query).trim();
     if (!finalValue) return;
 
-    console.log(`redirected to the page recepies?category=${finalValue}`);
-    navigate(`/recepies?category=${encodeURIComponent(finalValue)}`);
+    navigate(`/recepies?name=${encodeURIComponent(finalValue)}&page=1&pageSize=20`);
+  }
+
+  function submitSuggestionSearch(value) {
+    if (!value) return;
+    selectSuggestion(value.value);
+
+    if(value.type === 1){
+      navigate(`/recepies?categoryId=${value.categoryId}&page=1&pageSize=20`);
+      return;
+    }
+
+    if(value.type === 2){
+      navigate(`/recepie/${value.id}`);
+      return;
+    }
+    
+    navigate(`/recepies?name=${value.value}&page=1&pageSize=20`);
   }
 
   function onKeyDown(e) {
@@ -108,8 +123,13 @@ export default function Search({
         highlightIndex >= 0 && highlightIndex < suggestions.length
           ? suggestions[highlightIndex]
           : null;
-      if (picked) selectSuggestion(picked);
-      submitSearch(picked ?? query);
+
+      if (picked?.value) {
+        selectSuggestion(picked.value);
+        submitSuggestionSearch(picked);
+        return;
+      }
+      submitSearch(picked.value ?? query);
     } else if (e.key === "Escape") {
       setIsOpen(false);
       setHighlightIndex(-1);
@@ -155,7 +175,7 @@ export default function Search({
                     }
                     onMouseEnter={() => setHighlightIndex(idx)}
                     onMouseDown={(e) => e.preventDefault()} 
-                    onClick={() => selectSuggestion(item.value)}
+                    onClick={() => submitSuggestionSearch(item)}
                     role="option"
                     aria-selected={idx === highlightIndex}
                   >

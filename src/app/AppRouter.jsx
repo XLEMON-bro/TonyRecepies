@@ -23,7 +23,7 @@ export default function AppRouter() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/recepie/:id?" element={<RecepieDetailsPage />} />
+        <Route path="/recepie/:id" element={<RecepieDetailsPage />} />
         <Route path="/recepies" element={<RecepiesPage />} />
 
         {/* Protected (any logged in user) */}

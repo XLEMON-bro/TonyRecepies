@@ -6,7 +6,7 @@ export default function Header() {
   const { isAuthenticated, roles, logout } = useAuth();
 
   return (
-    <header style={{ padding: 16, borderBottom: "1px solid #eee", display: "flex", gap: 12 }}>
+    <header style={{ padding: 16, borderBottom: "2px solid #e5e5e5", display: "flex", gap: 12 }}>
       <Link to="/">Home</Link>
       <Link to="/profile">Profile</Link>
       <Link to="/admin">Admin</Link>
