@@ -5,53 +5,55 @@ import { apiHelper } from "../apiHelper/http";
 import { buildUrl } from "../apiHelper/buildUrl";
 import ListComponent from "../components/ListComponents/ListComponent";
 import Search from "../components/Search/Search";
+import Pagination from "../components/Pagination/Pagination";
 
 export default function RecepiesPage(){
     const [searchParams] = useSearchParams();
-    const [cards, setCards] = useState([]);
+    const [recipesData, setrecipesData] = useState({});
     const name = searchParams.get("name"); 
     const categoryId = searchParams.get("categoryId"); 
     const page = Number(searchParams.get("page") ?? 1);
     const [dataIsLoading, setDataIsLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(page)
-    //Todo fetch data for recipes by name or categoryId (deepends what we get from params)
-    //Add pagination for pages at the bottom of page
-    //Add search at the top
 
     useEffect(() => {
         console.log("rendered details");
 
         async function getCards(){
-            let url = buildUrl("https://localhost:7210/api/recipes", {name: name, categoryId: categoryId, page: currentPage})
+            let url = buildUrl("https://localhost:7210/api/recipes", {name: name, categoryId: categoryId, page: currentPage, pageSize: 8})
             let response = await apiHelper.get(url);
             console.log(response);
 
             if(response.status == 200){
-              let cardsData = response.data.items;
-
-              setCards(cardsData);
-              setDataIsLoading(false);
+                setrecipesData(response.data);
+                setDataIsLoading(false);
             }
         };
 
         getCards();
 
-    }, [categoryId, name, page]);
+    }, [categoryId, name, currentPage]);
 
     return(
         <div>
             <Search/>
             <h1>Recipes</h1>
-            
-            {categoryId && <p>Filtering by category: {categoryId}</p>}
-            {name && <p>Filtering by name: {name}</p>}
-            <p>Page: {page}</p>
 
-            { dataIsLoading && cards.length > 0 ? 
+            { dataIsLoading  ? 
                 <div>Loading...</div>  : 
-                <ListComponent>
-                    {cards.map((card) => (<RecepieCard key={card.id} recepie={card}></RecepieCard>))}
-                </ListComponent>
+                (
+                <>
+                    <ListComponent>
+                        {recipesData.items.map((card) => (<RecepieCard key={card.id} recepie={card}></RecepieCard>))}
+                    </ListComponent>
+                    <Pagination
+                        currentPage={currentPage}
+                        numberOfPages={Math.ceil(recipesData.totalCount / recipesData.pageSize)}
+                        onPageChange={(page) => setCurrentPage(page)}
+                    />
+                </>
+                )
+
             }
         </div>
     );
