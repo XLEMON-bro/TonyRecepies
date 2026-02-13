@@ -85,6 +85,8 @@ export default function Search({
     const finalValue = (value ?? query).trim();
     if (!finalValue) return;
 
+    setIsOpen(false);
+
     navigate(`/recepies?name=${encodeURIComponent(finalValue)}`);
   }
 
@@ -129,7 +131,7 @@ export default function Search({
         submitSuggestionSearch(picked);
         return;
       }
-      submitSearch(picked.value ?? query);
+      submitSearch(picked?.value ?? query);
     } else if (e.key === "Escape") {
       setIsOpen(false);
       setHighlightIndex(-1);

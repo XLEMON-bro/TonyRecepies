@@ -1,39 +1,58 @@
 import { useSearchParams, Navigate } from "react-router-dom";
 import RecepieCard from "../components/RecepieCard/RecepieCard";
+import { useEffect, useState } from "react";
+import { apiHelper } from "../apiHelper/http";
+import { buildUrl } from "../apiHelper/buildUrl";
+import ListComponent from "../components/ListComponents/ListComponent";
+import Search from "../components/Search/Search";
 
 export default function RecepiesPage(){
     const [searchParams] = useSearchParams();
+    const [cards, setCards] = useState([]);
     const name = searchParams.get("name"); 
     const categoryId = searchParams.get("categoryId"); 
     const page = Number(searchParams.get("page") ?? 1);
+    const [dataIsLoading, setDataIsLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(page)
     //Todo fetch data for recipes by name or categoryId (deepends what we get from params)
     //Add pagination for pages at the bottom of page
     //Add search at the top
 
-    const recepie = {
-        id: 24,
-        name: "Burgers EL Hovnida",
-        imgUrl: "https://media.istockphoto.com/id/1337797176/uk/%D1%84%D0%BE%D1%82%D0%BE/%D1%8F%D0%BB%D0%BE%D0%B2%D0%B8%D1%87%D1%96-%D0%B1%D1%83%D1%80%D0%B3%D0%B5%D1%80%D0%B8-%D0%B7-%D1%81%D0%BE%D1%83%D1%81%D0%BE%D0%BC-%D0%BF%D0%B5%D1%81%D1%82%D0%BE.jpg?s=2048x2048&w=is&k=20&c=dJd_zl9SD9xgOh4ial0H0WkvH0jpoAe8qdfG9MDTrRs=",
-        timeToCook: "1h",
-        difficulty: "MEDIUM",
-        servings: 3,
-        isFavourite: false,
-    };
+    useEffect(() => {
+        console.log("rendered details");
+
+        async function getCards(){
+            let url = buildUrl("https://localhost:7210/api/recipes", {name: name, categoryId: categoryId, page: currentPage})
+            let response = await apiHelper.get(url);
+            console.log(response);
+
+            if(response.status == 200){
+              let cardsData = response.data.items;
+
+              setCards(cardsData);
+              setDataIsLoading(false);
+            }
+        };
+
+        getCards();
+
+    }, [categoryId, name, page]);
 
     return(
         <div>
+            <Search/>
             <h1>Recipes</h1>
             
             {categoryId && <p>Filtering by category: {categoryId}</p>}
             {name && <p>Filtering by name: {name}</p>}
             <p>Page: {page}</p>
 
-            <RecepieCard
-                recepie={recepie}
-                onFavouriteChanged={(id, next) => {
-                  console.log("Favourite changed:", id, next);
-                }}
-            />
+            { dataIsLoading && cards.length > 0 ? 
+                <div>Loading...</div>  : 
+                <ListComponent>
+                    {cards.map((card) => (<RecepieCard key={card.id} recepie={card}></RecepieCard>))}
+                </ListComponent>
+            }
         </div>
     );
 }

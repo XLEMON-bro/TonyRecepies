@@ -1,5 +1,4 @@
 #root {
-    max-width: 1280px;
     margin: 0 auto;
     text-align: center;
     width: 100%;
@@ -35,6 +34,12 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+
+  background-image: url("/TonyBackground.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* nice parallax feel */
 }
 
 h1 {

@@ -11,7 +11,7 @@ async function addToFavouriteMockApi(recepieId, makeFavourite) {
 export default function RecepieCard({ recepie, onFavouriteChanged }) {
   const navigate = useNavigate();
 
-  const [isFavourite, setIsFavourite] = useState(!!recepie.isFavourite);
+  const [isFavourite, setIsFavourite] = useState(!!recepie.favorite);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -72,7 +72,7 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") openDetails();
       }}
-      aria-label={`Open recipe ${recepie.name}`}>
+      aria-label={`Open recipe ${recepie.title}`}>
 
       <button
         type="button"
@@ -89,19 +89,19 @@ export default function RecepieCard({ recepie, onFavouriteChanged }) {
       <div className={styles.imageWrap}>
         <img
           className={styles.image}
-          src={recepie.imgUrl}
-          alt={recepie.name}
+          src={recepie.mainImageUrl}
+          alt={recepie.title}
           loading="lazy"
         />
       </div>
 
       <div className={styles.body}>
-        <h3 className={styles.name}>{recepie.name}</h3>
+        <h3 className={styles.name}>{recepie.title}</h3>
 
         <div className={styles.meta}>
           <div className={styles.row}>
             <span className={styles.label}>TIME:</span>
-            <span className={styles.value}>{recepie.timeToCook}</span>
+            <span className={styles.value}>{recepie.cookingTime}h</span>
           </div>
 
           <div className={styles.row}>
