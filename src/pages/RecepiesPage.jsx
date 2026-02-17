@@ -8,13 +8,14 @@ import Search from "../components/Search/Search";
 import Pagination from "../components/Pagination/Pagination";
 
 export default function RecepiesPage(){
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [recipesData, setrecipesData] = useState({});
     const name = searchParams.get("name"); 
-    const categoryId = searchParams.get("categoryId"); 
+    const categoryId = searchParams.get("categoryId");
     const page = Number(searchParams.get("page") ?? 1);
     const [dataIsLoading, setDataIsLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(page)
+    const [currentPage, setCurrentPage] = useState(page);
+    const params = new URLSearchParams(searchParams);
 
     useEffect(() => {
         console.log("rendered details");
@@ -23,6 +24,9 @@ export default function RecepiesPage(){
             let url = buildUrl("https://localhost:7210/api/recipes", {name: name, categoryId: categoryId, page: currentPage, pageSize: 8})
             let response = await apiHelper.get(url);
             console.log(response);
+
+            params.set("page", currentPage.toString());
+            setSearchParams(params);
 
             if(response.status == 200){
                 setrecipesData(response.data);
@@ -33,6 +37,10 @@ export default function RecepiesPage(){
         getCards();
 
     }, [categoryId, name, currentPage]);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    },[name, categoryId]);
 
     return(
         <div>

@@ -87,7 +87,7 @@ export default function Search({
 
     setIsOpen(false);
 
-    navigate(`/recepies?name=${encodeURIComponent(finalValue)}`);
+    navigate(`/recepies?name=${encodeURIComponent(finalValue)}&page=1`);
   }
 
   function submitSuggestionSearch(value) {
@@ -95,7 +95,7 @@ export default function Search({
     selectSuggestion(value.value);
 
     if(value.type === 1){
-      navigate(`/recepies?categoryId=${value.categoryId}`);
+      navigate(`/recepies?categoryId=${value.categoryId}&page=1`);
       return;
     }
 
