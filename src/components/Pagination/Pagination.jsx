@@ -7,7 +7,12 @@ export default function Pagination({ currentPage, numberOfPages, onPageChange })
 
   const items = useMemo(() => {
     if (!Number.isFinite(curr) || !Number.isFinite(total) || total <= 0) return [];
-    if (total <= 5) return Array.from({ length: total }, (_, i) => i + 1);
+    if (total <= 5) {
+      return Array.from({ length: total }, (_, i) => ({
+        type: "page", 
+        value: i + 1,
+      }));
+    }
 
     const result = [];
 
